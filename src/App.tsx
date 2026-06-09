@@ -748,6 +748,12 @@ function App() {
             Deposit adds available bankroll. Protect balance locks all available bankroll for {lockDays} days.
             Withdraw savings works only after funds are protected and the lock has expired.
           </p>
+          {isLimitHit && (
+            <div className="protectionNotice">
+              <strong>Loss limit reached</strong>
+              <span>Withdraw bankroll is paused. Protect the remaining bankroll to start the savings lock.</span>
+            </div>
+          )}
           <label>
             Amount {STABLE_TOKEN_SYMBOL}
             <input type="number" min="1" value={vaultAmount} onChange={(event) => setVaultAmount(Number(event.target.value))} />
@@ -761,7 +767,7 @@ function App() {
               <Coins size={18} />
               {vaultBusy ? 'Working...' : 'Deposit'}
             </button>
-            <button type="button" disabled={vaultBusy} onClick={() => runVaultAction('withdrawBankroll')}>
+            <button type="button" disabled={vaultBusy || isLimitHit} onClick={() => runVaultAction('withdrawBankroll')}>
               <Coins size={18} />
               Withdraw bankroll
             </button>

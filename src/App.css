@@ -471,6 +471,31 @@ button:disabled {
   padding: 12px;
 }
 
+.protectionNotice {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin: 12px 0 14px;
+  padding: 12px;
+}
+
+.protectionNotice strong,
+.protectionNotice span {
+  display: block;
+}
+
+.protectionNotice strong {
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.protectionNotice span {
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
 .contractBox {
   background: #f8fafc;
   border-radius: 8px;
