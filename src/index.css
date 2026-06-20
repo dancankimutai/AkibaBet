@@ -1,9 +1,14 @@
 :root {
   --bg: #eef3f0;
+  --card: #ffffff;
+  --card-muted: #f8fafc;
+  --input-bg: #f8fafc;
   --text: #111827;
   --muted: #667085;
   --line: #d9e3df;
+  --line-soft: #e5e7eb;
   --green: #0f766e;
+  --green-soft: #e0f2f1;
   --red: #dc2626;
   --gold: #b45309;
   color: var(--text);
@@ -15,8 +20,30 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root[data-theme='dark'] {
+  --bg: #0f1715;
+  --card: #151f1d;
+  --card-muted: #1d2a27;
+  --input-bg: #101917;
+  --text: #f4f7f6;
+  --muted: #a8b8b2;
+  --line: #2e403b;
+  --line-soft: #263632;
+  --green: #34d399;
+  --green-soft: #12342e;
+  --red: #f87171;
+  --gold: #fbbf24;
+}
+
 * {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {

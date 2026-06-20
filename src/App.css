@@ -1,23 +1,165 @@
 .shell {
   min-height: 100svh;
+  max-width: 100%;
+  overflow-x: hidden;
   padding: 20px;
+}
+
+.setupShell {
+  align-items: center;
+  display: flex;
+  min-height: 100svh;
+  padding: 20px;
+}
+
+.setupPanel {
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.94), rgba(17, 24, 39, 0.96)),
+    url('/stadium.png');
+  background-position: center;
+  background-size: cover;
+  border-radius: 8px;
+  color: #ffffff;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 34px;
+  width: 100%;
+}
+
+.setupPanel h1 {
+  color: #ffffff;
+  font-size: clamp(38px, 7vw, 76px);
+  line-height: 0.95;
+  margin: 0;
+}
+
+.setupPanel p {
+  color: #d1fae5;
+  font-size: 18px;
+  line-height: 1.45;
+  margin: 18px 0 0;
+  max-width: 640px;
+}
+
+.setupForm {
+  align-self: end;
+  background: #ffffff;
+  border-radius: 8px;
+  color: #111827;
+  padding: 20px;
+}
+
+.monthLockPreview {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.monthLockPreview strong,
+.monthLockPreview span {
+  display: block;
+}
+
+.monthLockPreview strong {
+  color: #111827;
+}
+
+.monthLockPreview span {
+  color: #667085;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 3px;
 }
 
 .topbar,
 .heroPanel,
 .workspace,
-.testnetPanel,
+.historyPage,
+.transactions,
 .tickets,
 .metricsGrid {
   margin: 0 auto;
   max-width: 1120px;
+  min-width: 0;
+  width: 100%;
 }
 
 .topbar {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
+  gap: 14px;
   justify-content: space-between;
   padding: 10px 0 18px;
+}
+
+.topbarLead {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  gap: 10px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.menuButton {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  flex: 0 0 42px;
+  height: 42px;
+  width: 42px;
+}
+
+.brandBlock {
+  align-items: center;
+  display: grid;
+  flex: 1 1 auto;
+  gap: 10px;
+  grid-template-columns: 42px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.brandBlock > div:last-child {
+  min-width: 0;
+}
+
+.brandMark {
+  align-items: center;
+  background: #0f766e;
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 20px;
+  font-weight: 900;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.brandSubtitle {
+  color: #667085;
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topActions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  min-width: 0;
 }
 
 .eyebrow {
@@ -36,25 +178,18 @@
 }
 
 .topbar h1 {
-  font-size: 24px;
-}
-
-.networkBadge {
-  background: #e0f2f1;
-  border-radius: 999px;
-  color: #0f766e;
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  margin-top: 8px;
-  padding: 7px 10px;
+  font-size: 22px;
+  line-height: 1.05;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 button,
 input,
 select {
   font: inherit;
+  min-width: 0;
 }
 
 button {
@@ -64,6 +199,7 @@ button {
   display: inline-flex;
   gap: 8px;
   justify-content: center;
+  min-width: 0;
 }
 
 .iconButton,
@@ -78,7 +214,80 @@ button {
 .iconButton {
   background: #111827;
   color: #f9fafb;
-  padding: 10px 14px;
+  min-height: 42px;
+  padding: 8px 13px;
+}
+
+.iconButton span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.themeButton {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  height: 42px;
+  width: 42px;
+}
+
+.menuOverlay {
+  background: rgba(15, 23, 42, 0.36);
+  inset: 0;
+  position: fixed;
+  z-index: 50;
+}
+
+.sideMenu {
+  background: #ffffff;
+  border-right: 1px solid #d9e3df;
+  box-shadow: 18px 0 50px rgba(15, 23, 42, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  max-width: 320px;
+  padding: 18px;
+  width: min(82vw, 320px);
+}
+
+.sideMenuHeader {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sideMenuHeader strong {
+  color: #111827;
+  font-size: 18px;
+}
+
+.sideMenuHeader button,
+.backButton {
+  background: #eef3f0;
+  border-radius: 8px;
+  color: #0f766e;
+  height: 38px;
+  width: 38px;
+}
+
+.sideMenu > button {
+  background: transparent;
+  border-radius: 8px;
+  color: #334155;
+  justify-content: flex-start;
+  min-height: 46px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.sideMenu > button.active,
+.sideMenu > button:hover {
+  background: #e0f2f1;
+  color: #0f766e;
 }
 
 .heroPanel {
@@ -124,6 +333,7 @@ button {
 .limitCard,
 .entryPanel,
 .vaultPanel,
+.historyPage,
 .tickets {
   background: #ffffff;
   border: 1px solid #d9e3df;
@@ -176,6 +386,19 @@ label {
   background: #dc2626;
 }
 
+.resetLimitButton {
+  background: transparent;
+  border: 1px solid #cfd8d4;
+  border-radius: 8px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 900;
+  margin-top: 12px;
+  min-height: 36px;
+  padding: 0 10px;
+  width: 100%;
+}
+
 .metricsGrid {
   display: grid;
   gap: 12px;
@@ -188,6 +411,7 @@ label {
   border: 1px solid #d9e3df;
   border-radius: 8px;
   padding: 16px;
+  min-width: 0;
 }
 
 .metric strong {
@@ -205,37 +429,10 @@ label {
   color: #dc2626;
 }
 
-.testnetPanel {
-  align-items: center;
-  background: #ffffff;
-  border: 1px solid #d9e3df;
-  border-radius: 8px;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  margin-top: 16px;
-  padding: 20px;
+.vaultBalanceGrid article {
+  min-width: 0;
 }
 
-.testnetPanel h3 {
-  color: #111827;
-  font-size: 18px;
-  margin: 0 0 6px;
-}
-
-.testnetPanel p {
-  color: #667085;
-  font-size: 14px;
-  margin: 0;
-}
-
-.balanceGrid {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: 1fr 1fr;
-}
-
-.balanceGrid article,
 .vaultBalanceGrid article {
   background: #f8fafc;
   border: 1px solid #e5e7eb;
@@ -243,7 +440,6 @@ label {
   padding: 12px;
 }
 
-.balanceGrid span,
 .vaultBalanceGrid span,
 .helperText {
   color: #667085;
@@ -251,7 +447,6 @@ label {
   font-weight: 800;
 }
 
-.balanceGrid strong,
 .vaultBalanceGrid strong {
   color: #111827;
   display: block;
@@ -266,29 +461,6 @@ label {
   margin-bottom: 12px;
 }
 
-.testnetActions {
-  display: grid;
-  gap: 8px;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.testnetActions a,
-.testnetActions button {
-  align-items: center;
-  background: #e0f2f1;
-  border-radius: 8px;
-  color: #0f766e;
-  display: inline-flex;
-  font-size: 13px;
-  font-weight: 800;
-  gap: 6px;
-  justify-content: center;
-  min-height: 42px;
-  padding: 0 10px;
-  text-decoration: none;
-}
-
 .helperText {
   grid-column: 1 / -1;
 }
@@ -298,16 +470,98 @@ label {
   gap: 16px;
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   margin-top: 16px;
+  min-width: 0;
 }
 
 .entryPanel,
 .vaultPanel,
+.historyPage,
 .tickets {
   padding: 20px;
+  min-width: 0;
 }
 
 .entryPanel.editing {
   border-color: #0f766e;
+}
+
+.entryPanel.collapsed {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.entryToggle {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d9e3df;
+  border-radius: 8px;
+  color: #111827;
+  display: flex;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 10px 12px;
+  text-align: left;
+  width: 100%;
+}
+
+.entryToggleMain {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.entryToggleIcon {
+  align-items: center;
+  background: #0f766e;
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 42px;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.entryToggleCopy {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.entryToggleCopy strong {
+  color: #111827;
+  font-size: 15px;
+  line-height: 1.1;
+}
+
+.entryToggleCopy small {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  max-width: 190px;
+}
+
+.entryToggleAction {
+  background: #e0f2f1;
+  border-radius: 999px;
+  color: #0f766e;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  margin-left: 10px;
+}
+
+.entryToggle + .editNotice,
+.entryToggle + .bankrollGateNotice,
+.entryToggle + .legsEditor {
+  margin-top: 14px;
 }
 
 .editNotice {
@@ -335,17 +589,69 @@ label {
   margin-top: 2px;
 }
 
+.bankrollGateNotice {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.bankrollGateNotice strong,
+.bankrollGateNotice span {
+  display: block;
+}
+
+.bankrollGateNotice strong {
+  color: #92400e;
+  font-size: 14px;
+}
+
+.bankrollGateNotice span,
+.formMessage {
+  color: #b45309;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bankrollGateNotice span {
+  margin-top: 3px;
+}
+
+.formMessage {
+  margin: 10px 0 0;
+}
+
 .sectionHeader {
   align-items: center;
   display: flex;
   gap: 8px;
+  justify-content: space-between;
   margin-bottom: 16px;
+}
+
+.sectionHeader > div {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
 }
 
 .sectionHeader h3 {
   color: #111827;
   font-size: 18px;
   margin: 0;
+}
+
+.refreshVaultButton {
+  background: #e0f2f1;
+  border-radius: 8px;
+  color: #0f766e;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 0 10px;
 }
 
 label {
@@ -363,6 +669,7 @@ select {
   color: #111827;
   min-height: 44px;
   padding: 0 12px;
+  width: 100%;
 }
 
 input:focus,
@@ -372,7 +679,6 @@ select:focus {
 }
 
 .fieldPair,
-.addPlatformRow,
 .legInput {
   display: grid;
   gap: 12px;
@@ -385,13 +691,9 @@ select:focus {
   grid-template-columns: 1fr;
 }
 
-.addPlatformRow {
-  align-items: end;
-  grid-template-columns: minmax(0, 1fr) 44px;
-}
-
-.addPlatformRow label {
-  margin-bottom: 14px;
+.vaultActionItem {
+  display: grid;
+  gap: 0;
 }
 
 .legsEditor {
@@ -404,11 +706,23 @@ select:focus {
 
 .legInput {
   align-items: end;
-  grid-template-columns: minmax(0, 1fr) 120px 44px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 130px 96px 44px;
+  min-width: 0;
 }
 
 .legInput label {
   margin-bottom: 10px;
+}
+
+.versusText {
+  align-items: center;
+  color: #667085;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 44px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
 }
 
 .smallIconButton {
@@ -417,12 +731,6 @@ select:focus {
   height: 44px;
   margin-bottom: 10px;
   width: 44px;
-}
-
-.addPlatformButton {
-  background: #e0f2f1;
-  color: #0f766e;
-  margin-bottom: 14px;
 }
 
 .primaryButton,
@@ -471,29 +779,360 @@ button:disabled {
   padding: 12px;
 }
 
-.protectionNotice {
+.walletStatus.error {
   background: #fef2f2;
-  border: 1px solid #fecaca;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.walletStatus.warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.walletStatus.success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.walletStatus span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.savingsLockStatus {
   border-radius: 8px;
   margin: 12px 0 14px;
   padding: 12px;
 }
 
-.protectionNotice strong,
-.protectionNotice span {
+.protectionOverlay {
+  align-items: center;
+  background: rgba(17, 24, 39, 0.72);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 18px;
+  position: fixed;
+  z-index: 20;
+}
+
+.protectionDialog {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  box-shadow: 0 22px 80px rgba(17, 24, 39, 0.3);
+  max-width: 420px;
+  padding: 20px;
+  width: 100%;
+}
+
+.protectionDialogIcon {
+  align-items: center;
+  background: #fef2f2;
+  border-radius: 8px;
+  color: #991b1b;
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  margin-bottom: 14px;
+  width: 48px;
+}
+
+.protectionDialog h3 {
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.protectionDialog p:not(.eyebrow) {
+  color: #667085;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 10px 0 0;
+}
+
+.protectionDialogStatus {
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.protectionDialogStatus.error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.protectionDialogStatus.warning {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.protectionDialogStatus.success {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.protectionDialogActions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+  margin-top: 18px;
+}
+
+.protectionDialogActions button {
+  border-radius: 8px;
+  font-weight: 900;
+  min-height: 46px;
+  width: 100%;
+}
+
+.protectionDialogActions button:first-child {
+  background: #991b1b;
+  color: #ffffff;
+}
+
+.protectionDialogActions button:last-child {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.savingsLockStatus strong,
+.savingsLockStatus span {
   display: block;
 }
 
-.protectionNotice strong {
-  color: #991b1b;
+.savingsLockStatus strong {
   font-size: 14px;
 }
 
-.protectionNotice span {
-  color: #b91c1c;
+.savingsLockStatus span {
+  font-size: 13px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+.unlockProgress {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.unlockProgress div {
+  background: rgba(146, 64, 14, 0.16);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.unlockProgress div span {
+  background: #f59e0b;
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  margin: 0;
+  transition: width 0.3s ease;
+}
+
+.unlockProgress small {
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.breakMessage {
+  background: rgba(255, 251, 235, 0.8);
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin: 12px 0 0;
+  padding: 10px;
+}
+
+.savingsLockStatus.locked {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.savingsLockStatus.unlocked {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.protectionRetry {
+  align-items: center;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin: 12px 0 14px;
+  padding: 12px;
+}
+
+.protectionRetry span {
+  color: #991b1b;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.protectionRetry button {
+  background: #991b1b;
+  border-radius: 8px;
+  color: #ffffff;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+.protectionPause {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  margin: 12px 0 14px;
+  padding: 12px;
+}
+
+.protectionPause strong,
+.protectionPause span {
+  display: block;
+}
+
+.protectionPause strong {
+  color: #92400e;
+  font-size: 14px;
+}
+
+.protectionPause span {
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+
+.vaultModePanel {
+  background: #ffffff;
+  border: 1px solid #cfd8d4;
+  border-radius: 8px;
+  margin-top: 8px;
+  padding: 14px;
+  box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.04);
+}
+
+.protectionModePanel {
+  border-color: #fecaca;
+}
+
+.vaultModeHeader {
+  margin-bottom: 12px;
+}
+
+.vaultModeHeader strong,
+.vaultModeHeader span {
+  display: block;
+}
+
+.vaultModeHeader strong {
+  color: #111827;
+  font-size: 15px;
+}
+
+.vaultModeHeader span {
+  color: #667085;
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.35;
   margin-top: 3px;
+}
+
+.vaultModeActions {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.vaultModeActions button {
+  border-radius: 8px;
+  font-weight: 800;
+  min-height: 42px;
+}
+
+.vaultModeActions button:last-child {
+  background: #e0f2f1;
+  color: #0f766e;
+}
+
+.vaultModeActions button:first-child {
+  background: #111827;
+  color: #ffffff;
+}
+
+.vaultModeActions button:last-child {
+  border: 1px solid #b7cbc4;
+}
+
+.vaultInlineMessage {
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 10px 0 0;
+  overflow-wrap: anywhere;
+  padding: 10px;
+}
+
+.vaultInlineMessage.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.vaultInlineMessage.warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.vaultInlineMessage.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.depositSummary {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 12px;
+}
+
+.depositSummary span,
+.depositSummary small {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.depositSummary strong {
+  color: #111827;
+  font-size: 18px;
+  margin-bottom: 6px;
 }
 
 .contractBox {
@@ -511,8 +1150,83 @@ button:disabled {
   margin-top: 4px;
 }
 
-.tickets {
+.tickets,
+.transactions {
   margin-top: 16px;
+}
+
+.historyPage {
+  margin-top: 16px;
+}
+
+.historyBackup {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #d9e3df;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.historyBackup strong,
+.historyBackup span {
+  display: block;
+}
+
+.historyBackup strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.historyBackup span {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 3px;
+}
+
+.historyBackupActions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.historyBackupActions button {
+  background: #e0f2f1;
+  border-radius: 8px;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 0 10px;
+}
+
+.historyBackupActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.emptyHistory {
+  background: #f8fafc;
+  border: 1px dashed #cfd8d4;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.emptyHistory strong,
+.emptyHistory span {
+  display: block;
+}
+
+.emptyHistory strong {
+  color: #111827;
+}
+
+.emptyHistory span {
+  margin-top: 4px;
 }
 
 .ticket {
@@ -523,10 +1237,53 @@ button:disabled {
   gap: 16px;
   padding: 14px 0;
   text-align: left;
+  min-width: 0;
 }
 
 .ticket:first-of-type {
   border-top: 0;
+}
+
+.transactionItem {
+  align-items: center;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.transactionItem:first-of-type {
+  border-top: 0;
+}
+
+.transactionItem strong,
+.transactionItem span,
+.transactionItem small {
+  display: block;
+}
+
+.transactionItem strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.transactionItem span,
+.transactionItem small {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.transactionItem code {
+  background: #eef3f0;
+  border-radius: 999px;
+  color: #0f766e;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 8px;
 }
 
 .ticket strong,
@@ -551,6 +1308,20 @@ button:disabled {
   gap: 12px;
   justify-content: space-between;
   padding: 8px 10px;
+  min-width: 0;
+}
+
+.legList span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.legList small {
+  color: #667085;
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 2px;
 }
 
 .legList strong {
@@ -603,6 +1374,10 @@ button:disabled {
     padding-bottom: 12px;
   }
 
+  .topActions {
+    flex: 0 1 auto;
+  }
+
   .topbar h1 {
     font-size: 22px;
   }
@@ -614,7 +1389,7 @@ button:disabled {
 
   .heroPanel,
   .workspace,
-  .testnetPanel,
+  .setupPanel,
   .metricsGrid {
     grid-template-columns: 1fr;
   }
@@ -629,6 +1404,18 @@ button:disabled {
     line-height: 1;
   }
 
+  .setupPanel {
+    padding: 22px;
+  }
+
+  .setupPanel h1 {
+    font-size: 38px;
+  }
+
+  .setupPanel p {
+    font-size: 15px;
+  }
+
   .heroCopy p:last-child {
     font-size: 15px;
     line-height: 1.4;
@@ -637,7 +1424,8 @@ button:disabled {
   .limitCard,
   .entryPanel,
   .vaultPanel,
-  .testnetPanel,
+  .historyPage,
+  .transactions,
   .tickets {
     padding: 14px;
   }
@@ -656,26 +1444,26 @@ button:disabled {
   }
 
   .fieldPair,
-  .addPlatformRow,
   .legInput,
   .vaultActions {
     grid-template-columns: 1fr;
   }
 
-  .testnetActions,
-  .balanceGrid,
   .vaultBalanceGrid {
     grid-template-columns: 1fr 1fr;
   }
 
-  .testnetActions a,
-  .testnetActions button {
-    font-size: 12px;
-    min-height: 40px;
-    padding: 0 8px;
+  .vaultModeActions {
+    grid-template-columns: 1fr;
   }
 
   .legInput label {
+    margin-bottom: 0;
+  }
+
+  .versusText {
+    height: auto;
+    justify-content: center;
     margin-bottom: 0;
   }
 
@@ -690,6 +1478,22 @@ button:disabled {
     gap: 8px;
   }
 
+  .transactionItem {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .historyBackup {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .historyBackupActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
   .ticket > div {
     width: 100%;
   }
@@ -701,19 +1505,78 @@ button:disabled {
 
 @media (max-width: 430px) {
   .topbar {
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .topbarLead {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .brandBlock {
+    gap: 7px;
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .brandMark {
+    font-size: 16px;
+    height: 34px;
+    width: 34px;
+  }
+
+  .brandSubtitle {
+    font-size: 10px;
+  }
+
+  .topbar h1 {
+    font-size: 18px;
+  }
+
+  .topActions {
+    flex: 0 0 auto;
+    margin-left: auto;
+    width: auto;
+  }
+
+  .menuButton {
+    flex-basis: 38px;
+    height: 38px;
+    width: 38px;
   }
 
   .iconButton {
-    width: 100%;
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 0 10px;
+    width: auto;
+  }
+
+  .compactWalletButton {
+    flex-basis: 38px;
+    padding: 0;
+    width: 38px;
+  }
+
+  .compactWalletButton span {
+    display: none;
+  }
+
+  .themeButton {
+    flex: 0 0 38px;
+    height: 38px;
+    width: 38px;
   }
 
   .heroCopy h2 {
     font-size: 30px;
   }
 
-  .testnetActions,
-  .balanceGrid,
+  .setupShell {
+    padding: 10px;
+  }
+
   .vaultBalanceGrid {
     grid-template-columns: 1fr;
   }
@@ -722,4 +1585,185 @@ button:disabled {
   select {
     font-size: 16px;
   }
+
+  .metricsGrid,
+  .fieldPair {
+    grid-template-columns: 1fr;
+  }
+
+  .entryToggle {
+    gap: 10px;
+  }
+
+  .entryToggleIcon {
+    flex-basis: 38px;
+    height: 38px;
+    width: 38px;
+  }
+
+  .entryToggleCopy small {
+    max-width: 170px;
+  }
+
+  .heroPanel,
+  .setupPanel {
+    padding: 16px;
+  }
+}
+
+:root[data-theme='dark'] .setupForm,
+:root[data-theme='dark'] .limitCard,
+:root[data-theme='dark'] .entryPanel,
+:root[data-theme='dark'] .vaultPanel,
+:root[data-theme='dark'] .historyPage,
+:root[data-theme='dark'] .transactions,
+:root[data-theme='dark'] .tickets,
+:root[data-theme='dark'] .metric {
+  background: var(--card);
+  border-color: var(--line);
+}
+
+:root[data-theme='dark'] .monthLockPreview,
+:root[data-theme='dark'] .legsEditor,
+:root[data-theme='dark'] .vaultBalanceGrid article,
+:root[data-theme='dark'] .contractBox,
+:root[data-theme='dark'] .legList li,
+:root[data-theme='dark'] .emptyHistory,
+:root[data-theme='dark'] .historyBackup,
+:root[data-theme='dark'] .depositSummary,
+:root[data-theme='dark'] .entryToggle,
+:root[data-theme='dark'] .protectionDialog,
+:root[data-theme='dark'] .sideMenu,
+:root[data-theme='dark'] .vaultModePanel {
+  background: var(--card-muted);
+  border-color: var(--line-soft);
+}
+
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] select {
+  background: var(--input-bg);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .sectionHeader h3,
+:root[data-theme='dark'] .topbar h1,
+:root[data-theme='dark'] .metric strong,
+:root[data-theme='dark'] .historyBackup strong,
+:root[data-theme='dark'] .sideMenuHeader strong,
+:root[data-theme='dark'] .transactionItem strong,
+:root[data-theme='dark'] .entryToggleCopy strong,
+:root[data-theme='dark'] .protectionDialog h3,
+:root[data-theme='dark'] .contractBox strong,
+:root[data-theme='dark'] .legList strong,
+:root[data-theme='dark'] .vaultModeHeader strong,
+:root[data-theme='dark'] .depositSummary strong,
+:root[data-theme='dark'] .emptyHistory strong,
+:root[data-theme='dark'] .monthLockPreview strong,
+:root[data-theme='dark'] .vaultBalanceGrid strong,
+:root[data-theme='dark'] .limitCard,
+:root[data-theme='dark'] .setupForm {
+  color: var(--text);
+}
+
+:root[data-theme='dark'] label,
+:root[data-theme='dark'] .limitCard span,
+:root[data-theme='dark'] .limitCard small,
+:root[data-theme='dark'] .metric span,
+:root[data-theme='dark'] .transactionItem span,
+:root[data-theme='dark'] .transactionItem small,
+:root[data-theme='dark'] .ticket span,
+:root[data-theme='dark'] .historyBackup span,
+:root[data-theme='dark'] .contractBox span,
+:root[data-theme='dark'] .helperText,
+:root[data-theme='dark'] .entryToggleCopy small,
+:root[data-theme='dark'] .protectionDialog p:not(.eyebrow),
+:root[data-theme='dark'] .vaultModeHeader span,
+:root[data-theme='dark'] .depositSummary span,
+:root[data-theme='dark'] .depositSummary small,
+:root[data-theme='dark'] .legList small,
+:root[data-theme='dark'] .monthLockPreview span {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] .secondaryButton,
+:root[data-theme='dark'] .refreshVaultButton,
+:root[data-theme='dark'] .backButton,
+:root[data-theme='dark'] .historyBackupActions button,
+:root[data-theme='dark'] .sideMenuHeader button,
+:root[data-theme='dark'] .vaultModeActions button:last-child {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .sideMenu > button {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] .sideMenu > button.active,
+:root[data-theme='dark'] .sideMenu > button:hover {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .resetLimitButton {
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] .transactionItem code {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .protectionDialogActions button:last-child {
+  background: var(--card);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .protectionRetry {
+  background: #351b1f;
+  border-color: #7f1d1d;
+}
+
+:root[data-theme='dark'] .protectionRetry span {
+  color: #fecaca;
+}
+
+:root[data-theme='dark'] .unlockProgress div {
+  background: rgba(251, 191, 36, 0.18);
+}
+
+:root[data-theme='dark'] .unlockProgress small {
+  color: #fbbf24;
+}
+
+:root[data-theme='dark'] .breakMessage,
+:root[data-theme='dark'] .protectionPause {
+  background: #33250d;
+  border-color: #92400e;
+  color: #fde68a;
+}
+
+:root[data-theme='dark'] .protectionPause strong,
+:root[data-theme='dark'] .protectionPause span {
+  color: #fde68a;
+}
+
+:root[data-theme='dark'] .vaultInlineMessage.error {
+  background: #351b1f;
+  border-color: #7f1d1d;
+  color: #fecaca;
+}
+
+:root[data-theme='dark'] .vaultInlineMessage.warning {
+  background: #33250d;
+  border-color: #92400e;
+  color: #fde68a;
+}
+
+:root[data-theme='dark'] .vaultInlineMessage.success {
+  background: #12342e;
+  border-color: #176b5b;
+  color: #a7f3d0;
 }

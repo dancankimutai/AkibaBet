@@ -13,8 +13,9 @@ contract AkibaVault {
     error TransferFailed();
 
     event Deposited(address indexed user, uint256 amount);
-    event ProtectionRulesUpdated(address indexed user, uint256 monthlyLossLimit, uint256 lockDays);
+    event ProtectionRulesUpdated(address indexed user, uint256 monthlyLossLimit, uint256 lockSeconds);
     event SavingsProtected(address indexed user, uint256 amount, uint256 unlockAt);
+    event SavingsUnlockedToBankroll(address indexed user, uint256 amount);
     event Withdrawn(address indexed user, uint256 amount);
 
     struct Account {
@@ -22,7 +23,7 @@ contract AkibaVault {
         uint256 protectedSavings;
         uint256 unlockAt;
         uint256 monthlyLossLimit;
-        uint256 lockDays;
+        uint256 lockSeconds;
     }
 
     IERC20 public immutable stableToken;
@@ -40,12 +41,12 @@ contract AkibaVault {
         emit Deposited(msg.sender, amount);
     }
 
-    function setProtectionRules(uint256 monthlyLossLimit, uint256 lockDays) external {
+    function setProtectionRulesSeconds(uint256 monthlyLossLimit, uint256 lockSeconds) external {
         Account storage account = accounts[msg.sender];
         account.monthlyLossLimit = monthlyLossLimit;
-        account.lockDays = lockDays;
+        account.lockSeconds = lockSeconds;
 
-        emit ProtectionRulesUpdated(msg.sender, monthlyLossLimit, lockDays);
+        emit ProtectionRulesUpdated(msg.sender, monthlyLossLimit, lockSeconds);
     }
 
     function protectBalance() external {
@@ -56,7 +57,7 @@ contract AkibaVault {
         account.bankroll = 0;
         account.protectedSavings += amount;
         account.unlockAt =
-            block.timestamp + (account.lockDays == 0 ? 30 days : account.lockDays * 1 days);
+            block.timestamp + (account.lockSeconds == 0 ? 5 minutes : account.lockSeconds);
 
         emit SavingsProtected(msg.sender, amount, account.unlockAt);
     }
@@ -73,7 +74,7 @@ contract AkibaVault {
         emit Withdrawn(msg.sender, amount);
     }
 
-    function withdrawProtectedSavings() external {
+    function unlockProtectedToBankroll() external {
         Account storage account = accounts[msg.sender];
         uint256 amount = account.protectedSavings;
 
@@ -82,8 +83,8 @@ contract AkibaVault {
 
         account.protectedSavings = 0;
         account.unlockAt = 0;
-        if (!stableToken.transfer(msg.sender, amount)) revert TransferFailed();
+        account.bankroll += amount;
 
-        emit Withdrawn(msg.sender, amount);
+        emit SavingsUnlockedToBankroll(msg.sender, amount);
     }
 }
