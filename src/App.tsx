@@ -3,7 +3,7 @@ import {
   BadgeCheck,
   Coins,
   ArrowLeft,
-  Download,
+  HelpCircle,
   Landmark,
   Menu,
   Moon,
@@ -14,7 +14,6 @@ import {
   Sun,
   Trash2,
   TrendingDown,
-  Upload,
   Wallet,
   X,
 } from 'lucide-react'
@@ -33,7 +32,6 @@ const DEFAULT_STABLE_TOKEN_ADDRESS = CELO_NETWORK === 'sepolia' ? CELO_SEPOLIA_U
 const STABLE_TOKEN_SYMBOL = import.meta.env.VITE_STABLE_TOKEN_SYMBOL ?? DEFAULT_STABLE_TOKEN_SYMBOL
 const STABLE_TOKEN_ADDRESS = (import.meta.env.VITE_STABLE_TOKEN_ADDRESS ?? DEFAULT_STABLE_TOKEN_ADDRESS) as Address
 const VAULT_ADDRESS = import.meta.env.VITE_VAULT_ADDRESS as Address | undefined
-const BET_STORAGE_API_URL = import.meta.env.VITE_BET_STORAGE_API_URL ?? '/api/bets'
 const USD_KES_RATE_FALLBACK = 129
 const USD_KES_RATE_URL = 'https://open.er-api.com/v6/latest/USD'
 const TEST_LOCK_SECONDS = 5 * 60
@@ -95,8 +93,7 @@ const EDIT_WINDOW_MS = 5 * 60 * 1000
 const SETTLEMENT_EDIT_WINDOW_MS = 2 * 60 * 1000
 const LOSS_LIMIT_STORAGE_KEY = 'akibabet-loss-limit'
 const BET_HISTORY_STORAGE_KEY = 'akibabet-bet-history'
-const DEFAULT_BET_STORAGE_OWNER = 'guest'
-const HISTORY_SIGNATURE_STORAGE_KEY = 'akibabet-history-signature'
+const TUTORIAL_STORAGE_KEY = 'akibabet-tutorial-complete'
 const TRANSACTION_HISTORY_STORAGE_KEY = 'akibabet-transaction-history'
 const EXCHANGE_RATE_STORAGE_KEY = 'akibabet-usd-kes-rate'
 
@@ -123,8 +120,7 @@ function getPublicClient() {
 
 function App() {
   const entryFormRef = useRef<HTMLFormElement | null>(null)
-  const backupFileRef = useRef<HTMLInputElement | null>(null)
-  const [bets, setBets] = useState<BetSlip[]>(() => loadLocalBetHistory(DEFAULT_BET_STORAGE_OWNER))
+  const [bets, setBets] = useState<BetSlip[]>(() => loadBetHistory())
   const [transactions, setTransactions] = useState<TransactionEntry[]>(() => loadTransactionHistory())
   const [legs, setLegs] = useState<BetLeg[]>([{ id: 1, awayTeam: '', homeTeam: '', odds: 1.9, pick: 'home' }])
   const [availablePlatforms, setAvailablePlatforms] = useState(platforms)
@@ -152,8 +148,7 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState<ExchangeRateState>(() => loadExchangeRate())
   const [activeView, setActiveView] = useState<AppView>('dashboard')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [betStorageOwner, setBetStorageOwner] = useState(DEFAULT_BET_STORAGE_OWNER)
-  const [backupMessage, setBackupMessage] = useState('Connect wallet to sync betslips by wallet address.')
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false)
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000)
@@ -166,45 +161,8 @@ function App() {
   }, [theme])
 
   useEffect(() => {
-    saveLocalBetHistory(betStorageOwner, bets)
-
-    if (wallet && betStorageOwner === getBetStorageOwner(wallet)) {
-      void saveRemoteBetHistory(wallet, bets)
-    }
-  }, [betStorageOwner, bets, wallet])
-
-  useEffect(() => {
-    if (!wallet) {
-      return
-    }
-
-    let cancelled = false
-    const connectedWallet = wallet
-    const owner = getBetStorageOwner(connectedWallet)
-
-    async function syncWalletHistory() {
-      const localBets = loadLocalBetHistory(owner)
-      const remoteBets = await loadRemoteBetHistory(connectedWallet)
-
-      if (cancelled) {
-        return
-      }
-
-      setBetStorageOwner(owner)
-      setBets((current) => mergeBetHistory(mergeBetHistory(current, localBets), remoteBets ?? []))
-      setBackupMessage(
-        remoteBets
-          ? 'Betslips sync by connected wallet address.'
-          : 'Wallet history is cached locally. Deploy with Netlify to enable cloud KV sync.',
-      )
-    }
-
-    void syncWalletHistory()
-
-    return () => {
-      cancelled = true
-    }
-  }, [wallet])
+    window.localStorage.setItem(BET_HISTORY_STORAGE_KEY, JSON.stringify(bets))
+  }, [bets])
 
   useEffect(() => {
     window.localStorage.setItem(TRANSACTION_HISTORY_STORAGE_KEY, JSON.stringify(transactions))
@@ -303,6 +261,9 @@ function App() {
   const requiredDepositLabel = formatStableAmount(requiredDeposit)
   const depositAmountDueLabel = formatStableAmount(depositAmountDue)
   const shouldShowProtectionPrompt = isLimitHit && !hasProtectedSavings && !isProtectionPromptDismissed
+  const cyclePendingExposure = bets
+    .filter((bet) => bet.status === 'pending' && bet.createdAt >= cycleStartedAt)
+    .reduce((sum, bet) => sum + bet.stake, 0)
 
   function saveMonthlyLossLimit() {
     if (setupLossLimit < 100) {
@@ -336,6 +297,9 @@ function App() {
 
       const isMiniPay = Boolean(window.ethereum?.isMiniPay)
       setWalletMessage(isMiniPay ? 'MiniPay wallet connected' : 'Celo wallet connected')
+      if (window.localStorage.getItem(TUTORIAL_STORAGE_KEY) !== 'true') {
+        setIsTutorialOpen(true)
+      }
       void refreshVaultAccount(account)
     } catch (error) {
       setWalletMessage(getWalletErrorMessage(error))
@@ -521,19 +485,21 @@ function App() {
       setWalletMessage(`Vault transaction sent: ${hash.slice(0, 10)}...`)
       if (action === 'unlockProtected') {
         await publicClient.waitForTransactionReceipt({ hash })
+        await refreshVaultAccount(account)
         window.localStorage.removeItem(LOSS_LIMIT_STORAGE_KEY)
         setLossLimitConfig(null)
         setSetupLossLimit(lossLimit)
         setSetupLockSeconds(lockSeconds)
         setIsProtectionPromptDismissed(false)
         setBetFormMessage('Set a new loss limit before logging more betslips.')
+      } else {
+        void refreshVaultAccount(account)
       }
       recordTransaction(
         action === 'protect' ? 'Lock funds to vault' : 'Unlock to bankroll',
         hash,
         action === 'protect' ? undefined : `${vaultAccount?.protectedSavings ?? '--'} ${STABLE_TOKEN_SYMBOL}`,
       )
-      void refreshVaultAccount(account)
       setVaultMode(null)
     } catch (error) {
       setWalletMessage(getVaultErrorMessage(error))
@@ -568,6 +534,30 @@ function App() {
       return
     }
 
+    if (!editingBetId && stake > lossLimit) {
+      setBetFormMessage('Stake cannot be higher than your loss limit.')
+      return
+    }
+
+    const betBeingEdited = editingBetId ? bets.find((bet) => bet.id === editingBetId) : null
+    const editedPendingExposure = betBeingEdited?.status === 'pending' && betBeingEdited.createdAt >= cycleStartedAt
+      ? betBeingEdited.stake
+      : 0
+    const nextPendingExposure = cyclePendingExposure - editedPendingExposure + (status === 'pending' ? stake : 0)
+    const nextCycleLosses = cycleStats.losses
+      - (betBeingEdited?.status === 'lost' && (betBeingEdited.settledAt ?? betBeingEdited.createdAt) >= cycleStartedAt ? betBeingEdited.stake : 0)
+      + (status === 'lost' ? stake : 0)
+
+    if (stake > lossLimit) {
+      setBetFormMessage('Stake cannot be higher than your loss limit.')
+      return
+    }
+
+    if (nextCycleLosses + nextPendingExposure > lossLimit) {
+      setBetFormMessage('This slip would exceed your remaining loss limit.')
+      return
+    }
+
     if (editingBetId) {
       setBets((current) => current.map((bet) => (
         bet.id === editingBetId
@@ -594,6 +584,7 @@ function App() {
     setStatus('pending')
     setBetFormMessage('Betslip saved.')
     setIsBetFormOpen(false)
+    setActiveView('betslips')
   }
 
   function recordTransaction(label: string, hash?: string, amount?: string) {
@@ -608,49 +599,6 @@ function App() {
       },
       ...current,
     ].slice(0, 30))
-  }
-
-  function exportBetHistory() {
-    const payload = JSON.stringify({
-      app: 'AkibaBet',
-      bets,
-      createdAt: new Date().toISOString(),
-      version: 1,
-    }, null, 2)
-    const blob = new Blob([payload], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `akibabet-bets-${new Date().toISOString().slice(0, 10)}.json`
-    link.click()
-    URL.revokeObjectURL(url)
-    setBackupMessage('Backup exported. Keep that file so you can restore this history later.')
-  }
-
-  async function importBetHistory(file?: File) {
-    if (!file) {
-      return
-    }
-
-    try {
-      const text = await file.text()
-      const parsed = JSON.parse(text) as { bets?: BetSlip[] }
-      const importedBets = sanitizeBetHistory(parsed.bets)
-
-      if (!importedBets.length) {
-        setBackupMessage('No valid betslips found in that backup file.')
-        return
-      }
-
-      setBets((current) => mergeBetHistory(current, importedBets))
-      setBackupMessage(`Restored ${importedBets.length} betslip${importedBets.length === 1 ? '' : 's'} from backup.`)
-    } catch {
-      setBackupMessage('Backup restore failed. Choose a valid AkibaBet backup file.')
-    } finally {
-      if (backupFileRef.current) {
-        backupFileRef.current.value = ''
-      }
-    }
   }
 
   function updateLeg(id: number, patch: Partial<BetLeg>) {
@@ -700,6 +648,7 @@ function App() {
     setStake(bet.stake)
     setStatus(bet.status)
     setIsBetFormOpen(true)
+    setActiveView('dashboard')
 
     if (!availablePlatforms.includes(bet.platform)) {
       setAvailablePlatforms((current) => [...current, bet.platform])
@@ -755,6 +704,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function completeTutorial() {
+    window.localStorage.setItem(TUTORIAL_STORAGE_KEY, 'true')
+    setIsTutorialOpen(false)
+  }
+
   if (!lossLimitConfig) {
     return (
       <main className="setupShell">
@@ -773,9 +727,10 @@ function App() {
               <input
                 type="number"
                 min="100"
-                value={setupLossLimit}
-                onChange={(event) => setSetupLossLimit(Number(event.target.value))}
+                value={setupLossLimit || ''}
+                onChange={(event) => setSetupLossLimit(event.target.value === '' ? 0 : Number(event.target.value))}
               />
+              <span className="inputHint">Minimum loss limit is KES 100.</span>
             </label>
             <label>
               Funds lock duration
@@ -790,7 +745,7 @@ function App() {
               <strong>{formatKes(setupLossLimit)}</strong>
               <span>After this loss limit is hit, remaining bankroll locks for {formatLockDuration(setupLockSeconds)}.</span>
             </div>
-            <button className="primaryButton" type="button" onClick={saveMonthlyLossLimit}>
+            <button className="primaryButton" type="button" disabled={setupLossLimit < 100} onClick={saveMonthlyLossLimit}>
               Start tracking
             </button>
           </div>
@@ -820,6 +775,14 @@ function App() {
           </div>
         </div>
         <div className="topActions">
+          <button
+            className="themeButton"
+            type="button"
+            onClick={() => setIsTutorialOpen(true)}
+            title="Open walkthrough"
+          >
+            <HelpCircle size={18} />
+          </button>
           <button
             className="themeButton"
             type="button"
@@ -865,15 +828,57 @@ function App() {
         </div>
       )}
 
+      {isTutorialOpen && (
+        <div className="protectionOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+          <div className="tutorialDialog">
+            <div className="sideMenuHeader">
+              <strong id="tutorial-title">How AkibaBet works</strong>
+              <button type="button" onClick={() => setIsTutorialOpen(false)} title="Close walkthrough">
+                <X size={18} />
+              </button>
+            </div>
+            <ol className="tutorialSteps">
+              <li>
+                <strong>Set your loss limit</strong>
+                <span>Choose the maximum KES you are willing to lose before protection starts.</span>
+              </li>
+              <li>
+                <strong>Deposit to Akiba Vault</strong>
+                <span>Deposit the matching USDT bankroll so every slip is tracked against real funds.</span>
+              </li>
+              <li>
+                <strong>Log each betslip</strong>
+                <span>Add all games in the slip, the pick, odds, stake, platform, and result.</span>
+              </li>
+              <li>
+                <strong>Watch the real position</strong>
+                <span>ROI, total staked, and loss limit progress update from your saved slips. Use the top-left menu to view Betslip history and Transaction history.</span>
+              </li>
+              <li>
+                <strong>Lock when the limit is hit</strong>
+                <span>When losses reach your limit, lock remaining bankroll for the duration you selected.</span>
+              </li>
+              <li>
+                <strong>Unlock to bankroll</strong>
+                <span>After the timer ends, unlock funds back into bankroll and start a fresh limit cycle.</span>
+              </li>
+            </ol>
+            <div className="tutorialActions">
+              <button type="button" onClick={completeTutorial}>Got it</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {activeView === 'dashboard' ? (
       <>
       <section className="heroPanel">
         <div className="heroCopy">
           <p className="eyebrow">Betting tracker + bankroll protection</p>
-          <h2>See the real ROI before emotion spends the rest.</h2>
+          <h2>Know if betting is costing you before it gets worse.</h2>
           <p>
-            Track every betslip from Kenyan betting platforms, face the real profit/loss,
-            and move protected {STABLE_TOKEN_SYMBOL} into a time-locked savings vault.
+            AkibaBet helps you log every betslip, see your real wins and losses,
+            set a personal loss limit, and lock remaining {STABLE_TOKEN_SYMBOL} when you need a break.
           </p>
         </div>
         <div className={isLimitHit ? 'limitCard danger' : 'limitCard'}>
@@ -981,8 +986,8 @@ function App() {
                     type="number"
                     min="1.01"
                     step="0.01"
-                    value={leg.odds}
-                    onChange={(event) => updateLeg(leg.id, { odds: Number(event.target.value) })}
+                    value={leg.odds || ''}
+                    onChange={(event) => updateLeg(leg.id, { odds: event.target.value === '' ? 0 : Number(event.target.value) })}
                   />
                 </label>
                 <button
@@ -1035,7 +1040,12 @@ function App() {
               </div>
               <label>
                 Betslip stake KES
-                <input type="number" min="1" value={stake} onChange={(event) => setStake(Number(event.target.value))} />
+                <input
+                  type="number"
+                  min="1"
+                  value={stake || ''}
+                  onChange={(event) => setStake(event.target.value === '' ? 0 : Number(event.target.value))}
+                />
               </label>
               <button className="primaryButton" type="submit" disabled={(!hasVaultBankroll || isProtectionCycleActive) && !editingBetId}>
                 <Plus size={18} />
@@ -1174,7 +1184,12 @@ function App() {
                   </div>
                   <label>
                     Amount {STABLE_TOKEN_SYMBOL}
-                    <input type="number" min="1" value={vaultAmount} onChange={(event) => setVaultAmount(Number(event.target.value))} />
+                    <input
+                      type="number"
+                      min="1"
+                      value={vaultAmount || ''}
+                      onChange={(event) => setVaultAmount(event.target.value === '' ? 0 : Number(event.target.value))}
+                    />
                   </label>
                   <div className="vaultModeActions">
                     <button type="button" disabled={vaultBusy} onClick={() => runVaultAction('withdrawBankroll')}>
@@ -1258,29 +1273,6 @@ function App() {
             <h3>Betslip history</h3>
           </div>
         </div>
-        <div className="historyBackup">
-          <div>
-            <strong>Wallet history</strong>
-            <span>{backupMessage}</span>
-          </div>
-          <div className="historyBackupActions">
-            <button type="button" onClick={exportBetHistory} disabled={bets.length === 0}>
-              <Download size={16} />
-              Export
-            </button>
-            <button type="button" onClick={() => backupFileRef.current?.click()}>
-              <Upload size={16} />
-              Restore
-            </button>
-          </div>
-          <input
-            ref={backupFileRef}
-            type="file"
-            accept="application/json"
-            hidden
-            onChange={(event) => void importBetHistory(event.target.files?.[0])}
-          />
-        </div>
         {bets.length === 0 && (
           <div className="emptyHistory">
             <strong>No betslips yet</strong>
@@ -1326,7 +1318,7 @@ function App() {
                   type="button"
                   onClick={() => editBet(bet)}
                 >
-                  Edit {formatRemainingEditTime(bet, now)}
+                  Edit slip {formatRemainingEditTime(bet, now)}
                 </button>
               )}
             </div>
@@ -1398,18 +1390,9 @@ function getPickLabel(leg: BetLeg) {
   return `Pick: ${getHomeTeam(leg)} win`
 }
 
-function getBetStorageOwner(wallet?: Address | null) {
-  return wallet ? `wallet:${wallet.toLowerCase()}` : DEFAULT_BET_STORAGE_OWNER
-}
-
-function getBetStorageKey(owner: string) {
-  return `${BET_HISTORY_STORAGE_KEY}:${owner}`
-}
-
-function loadLocalBetHistory(owner: string) {
+function loadBetHistory() {
   try {
-    const raw = window.localStorage.getItem(getBetStorageKey(owner))
-      ?? (owner === DEFAULT_BET_STORAGE_OWNER ? window.localStorage.getItem(BET_HISTORY_STORAGE_KEY) : null)
+    const raw = window.localStorage.getItem(BET_HISTORY_STORAGE_KEY)
     if (!raw) {
       return []
     }
@@ -1418,63 +1401,6 @@ function loadLocalBetHistory(owner: string) {
   } catch {
     return []
   }
-}
-
-function saveLocalBetHistory(owner: string, bets: BetSlip[]) {
-  window.localStorage.setItem(getBetStorageKey(owner), JSON.stringify(bets))
-}
-
-async function loadRemoteBetHistory(wallet: Address) {
-  try {
-    const signature = await getHistorySignature(wallet)
-    const response = await fetch(`${BET_STORAGE_API_URL}?wallet=${wallet}`, {
-      headers: { 'x-akibabet-signature': signature },
-    })
-    if (!response.ok) {
-      throw new Error('Remote history unavailable')
-    }
-
-    const payload = await response.json() as { bets?: unknown[] }
-    return sanitizeBetHistory(payload.bets)
-  } catch {
-    return null
-  }
-}
-
-async function saveRemoteBetHistory(wallet: Address, bets: BetSlip[]) {
-  try {
-    const signature = await getHistorySignature(wallet)
-    await fetch(`${BET_STORAGE_API_URL}?wallet=${wallet}`, {
-      body: JSON.stringify({ bets }),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-akibabet-signature': signature,
-      },
-      method: 'PUT',
-    })
-  } catch {
-    // Local cache remains the fallback while the KV backend is unavailable.
-  }
-}
-
-async function getHistorySignature(wallet: Address) {
-  const key = `${HISTORY_SIGNATURE_STORAGE_KEY}:${wallet.toLowerCase()}`
-  const cached = window.localStorage.getItem(key)
-  if (cached) {
-    return cached
-  }
-
-  const client = getWalletClient()
-  const signature = await client.signMessage({
-    account: wallet,
-    message: getHistorySyncMessage(wallet),
-  })
-  window.localStorage.setItem(key, signature)
-  return signature
-}
-
-function getHistorySyncMessage(wallet: Address | string) {
-  return `AkibaBet history sync\nWallet: ${wallet.toLowerCase()}`
 }
 
 function sanitizeBetHistory(value: unknown) {
@@ -1505,13 +1431,6 @@ function sanitizeBetHistory(value: unknown) {
       })),
       status: bet.status ?? 'pending',
     }))
-}
-
-function mergeBetHistory(current: BetSlip[], importedBets: BetSlip[]) {
-  const existingIds = new Set(current.map((bet) => bet.id))
-  const uniqueImported = importedBets.filter((bet) => !existingIds.has(bet.id))
-
-  return [...uniqueImported, ...current].sort((a, b) => b.createdAt - a.createdAt)
 }
 
 function loadTransactionHistory() {

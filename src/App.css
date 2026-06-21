@@ -661,6 +661,13 @@ label {
   margin-bottom: 14px;
 }
 
+.inputHint {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
 input,
 select {
   background: #f8fafc;
@@ -1159,56 +1166,6 @@ button:disabled {
   margin-top: 16px;
 }
 
-.historyBackup {
-  align-items: center;
-  background: #f8fafc;
-  border: 1px solid #d9e3df;
-  border-radius: 8px;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding: 12px;
-}
-
-.historyBackup strong,
-.historyBackup span {
-  display: block;
-}
-
-.historyBackup strong {
-  color: #111827;
-  font-size: 14px;
-}
-
-.historyBackup span {
-  color: #667085;
-  font-size: 12px;
-  font-weight: 800;
-  margin-top: 3px;
-}
-
-.historyBackupActions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 8px;
-}
-
-.historyBackupActions button {
-  background: #e0f2f1;
-  border-radius: 8px;
-  color: #0f766e;
-  font-size: 13px;
-  font-weight: 900;
-  min-height: 38px;
-  padding: 0 10px;
-}
-
-.historyBackupActions button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
 .emptyHistory {
   background: #f8fafc;
   border: 1px dashed #cfd8d4;
@@ -1484,16 +1441,6 @@ button:disabled {
     gap: 8px;
   }
 
-  .historyBackup {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .historyBackupActions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
   .ticket > div {
     width: 100%;
   }
@@ -1629,7 +1576,6 @@ button:disabled {
 :root[data-theme='dark'] .contractBox,
 :root[data-theme='dark'] .legList li,
 :root[data-theme='dark'] .emptyHistory,
-:root[data-theme='dark'] .historyBackup,
 :root[data-theme='dark'] .depositSummary,
 :root[data-theme='dark'] .entryToggle,
 :root[data-theme='dark'] .protectionDialog,
@@ -1649,7 +1595,6 @@ button:disabled {
 :root[data-theme='dark'] .sectionHeader h3,
 :root[data-theme='dark'] .topbar h1,
 :root[data-theme='dark'] .metric strong,
-:root[data-theme='dark'] .historyBackup strong,
 :root[data-theme='dark'] .sideMenuHeader strong,
 :root[data-theme='dark'] .transactionItem strong,
 :root[data-theme='dark'] .entryToggleCopy strong,
@@ -1667,13 +1612,13 @@ button:disabled {
 }
 
 :root[data-theme='dark'] label,
+:root[data-theme='dark'] .inputHint,
 :root[data-theme='dark'] .limitCard span,
 :root[data-theme='dark'] .limitCard small,
 :root[data-theme='dark'] .metric span,
 :root[data-theme='dark'] .transactionItem span,
 :root[data-theme='dark'] .transactionItem small,
 :root[data-theme='dark'] .ticket span,
-:root[data-theme='dark'] .historyBackup span,
 :root[data-theme='dark'] .contractBox span,
 :root[data-theme='dark'] .helperText,
 :root[data-theme='dark'] .entryToggleCopy small,
@@ -1689,7 +1634,6 @@ button:disabled {
 :root[data-theme='dark'] .secondaryButton,
 :root[data-theme='dark'] .refreshVaultButton,
 :root[data-theme='dark'] .backButton,
-:root[data-theme='dark'] .historyBackupActions button,
 :root[data-theme='dark'] .sideMenuHeader button,
 :root[data-theme='dark'] .vaultModeActions button:last-child {
   background: var(--green-soft);
@@ -1766,4 +1710,114 @@ button:disabled {
   background: #12342e;
   border-color: #176b5b;
   color: #a7f3d0;
+}
+
+.tutorialDialog {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+  max-height: 86svh;
+  max-width: 520px;
+  overflow-y: auto;
+  padding: 18px;
+  width: min(92vw, 520px);
+}
+
+.tutorialSteps {
+  counter-reset: tutorial-step;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+
+.tutorialSteps li {
+  align-items: flex-start;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  padding: 10px;
+}
+
+.tutorialSteps li::before {
+  align-items: center;
+  background: #0f766e;
+  border-radius: 8px;
+  color: #ffffff;
+  content: counter(tutorial-step);
+  counter-increment: tutorial-step;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.tutorialSteps strong,
+.tutorialSteps span {
+  display: block;
+  grid-column: 2;
+}
+
+.tutorialSteps strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.tutorialSteps span {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.tutorialActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.tutorialActions button {
+  background: #0f766e;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 900;
+  min-height: 42px;
+  padding: 0 16px;
+}
+
+:root[data-theme='dark'] .tutorialDialog,
+:root[data-theme='dark'] .tutorialSteps li {
+  background: var(--card-muted);
+  border-color: var(--line-soft);
+}
+
+:root[data-theme='dark'] .tutorialSteps strong {
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .tutorialSteps span {
+  color: var(--muted);
+}
+
+.savingsLockStatus.unlocked strong {
+  color: #166534;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.savingsLockStatus.unlocked span {
+  color: #166534;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+:root[data-theme='dark'] .savingsLockStatus.unlocked strong,
+:root[data-theme='dark'] .savingsLockStatus.unlocked span {
+  color: #86efac;
 }
